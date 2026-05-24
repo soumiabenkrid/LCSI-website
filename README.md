@@ -34,12 +34,7 @@ Ce projet est le site web du laboratoire LCSI, conçu pour présenter les équip
 
 ## Technologies utilisées
 
-### 1. **Base de données avec Neon**
-
-- **Neon** est utilisé pour le déploiement de la base de données PostgreSQL.
-- **Prisma** est utilisé comme ORM pour interagir avec la base de données.
-
-### 2. **Stockage d'images avec Cloudinary**
+### 1. **Stockage d'images avec Cloudinary**
 
 - **Cloudinary** est utilisé pour le stockage des fichiers uploadés.
 - **Configuration** :
@@ -84,7 +79,7 @@ Ce projet est le site web du laboratoire LCSI, conçu pour présenter les équip
 
 1. Clonez le dépôt :
    ```bash
-   git clone https://github.com/yasserbachta/lcsi-lab-website.git
+   git clone https://github.com/lahcenbcf/LCSI-website.git
    ```
 2. Installez les dépendances :
    ```bash
@@ -105,7 +100,7 @@ Ce projet est le site web du laboratoire LCSI, conçu pour présenter les équip
 
 0. here's link to a drive to know how to get each variable : 
 
-1. DATABASE_URL : (ex :fourine par Neon ) //Neon is a serverless PostgreSQL
+1. DATABASE_URL : local Database URL deployed in Docker (postgres)
 2. NEXTAUTH_SECRET : générez un secret fort ex via Node (node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
 
 3. Google OAuth: GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET.

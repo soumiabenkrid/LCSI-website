@@ -5,83 +5,29 @@ import { Language } from "@/generated/prisma";
 import { canUserModifyPublication } from "@/lib/publicationPermissions";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> } // or standard context
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
+
     const publication = await prisma.publication.findUnique({
-      where: { id },
+      where: {
+        id: Number(id), // 💡 CRITICAL: Ensure this is wrapped in Number()
+      },
       include: {
         translations: true,
-        team: {
-          include: {
-            translations: true,
-          },
-        },
-        authors: {
-          include: {
-            author: true,
-          },
-          orderBy: { order: "asc" },
-        },
+        authors: true,
       },
     });
 
     if (!publication) {
-      return NextResponse.json(
-        { error: "Publication introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Publication non trouvée" }, { status: 404 });
     }
 
-    // Trouver les traductions FR et EN
-    const translationFR = (publication as any).translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const translationEN = (publication as any).translations.find(
-      (t: any) => t.language === "EN"
-    );
-    const teamTranslationFR = (publication as any).team?.translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const teamTranslationEN = (publication as any).team?.translations.find(
-      (t: any) => t.language === "EN"
-    );
-
-    // Formatter les données
-    const formattedPublication = {
-      id: publication.id,
-      title_fr: translationFR?.title || "",
-      title_en: translationEN?.title || "",
-      abstract_fr: translationFR?.abstract || "",
-      abstract_en: translationEN?.abstract || "",
-      keywords_fr: translationFR?.keywords || [],
-      keywords_en: translationEN?.keywords || [],
-      journal: publication.journal,
-      volume: publication.volume,
-      issue: publication.issue,
-      pages: publication.pages,
-      doi: publication.doi,
-      url: publication.url,
-      year: publication.year,
-      publishedAt: publication.publishedAt,
-      createdAt: publication.createdAt,
-      team: (publication as any).team?.slug,
-      teamName_fr: teamTranslationFR?.name || "",
-      teamName_en: teamTranslationEN?.name || "",
-      authors: (publication as any).authors.map((authorRel: any) => ({
-        id: authorRel.author.id,
-        firstname: authorRel.author.firstname,
-        lastname: authorRel.author.lastname,
-        email: authorRel.author.email,
-        order: authorRel.order,
-      })),
-    };
-
-    return NextResponse.json(formattedPublication);
+    return NextResponse.json(publication);
   } catch (error) {
-    console.error("Erreur lors de la récupération de la publication:", error);
+    console.error("❌ GET PUBLICATION ERROR:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

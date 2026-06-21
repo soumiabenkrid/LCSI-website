@@ -2,25 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { Language } from "@/generated/prisma";
-import { url } from "inspector";
 
+// GET - Retrieve a member by numerical ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    
+    // 1. Convert the incoming string id (e.g. "5") into an integer (5)
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ error: "Format d'identifiant invalide" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(request.url);
     const language = searchParams.get("language") || "FR";
 
     const member = await prisma.member.findUnique({
-      where: { id },
+      where: { id: numericId }, // Use parsed numerical integer value
       include: {
-        translations: true, // Get all translations (FR and EN)
-        user: true, // Include user to get Google profile image
+        translations: true,
+        user: true,
         team: {
           include: {
-            translations: true, // Get all translations (FR and EN)
+            translations: true,
           },
         },
         publications: {
@@ -36,8 +43,6 @@ export async function GET(
                     order: "asc",
                   },
                 },
-                // Include other publication fields as needed
-
               },
             },
           },
@@ -52,22 +57,12 @@ export async function GET(
       );
     }
 
-    // Formatter les données
-    // Récupérer les traductions FR et EN
-    const frTranslation = member.translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const enTranslation = member.translations.find(
-      (t: any) => t.language === "EN"
-    );
+    // Format Data Outbound
+    const frTranslation = member.translations.find((t: any) => t.language === "FR");
+    const enTranslation = member.translations.find((t: any) => t.language === "EN");
 
-    // Récupérer les traductions de l'équipe
-    const teamFrTranslation = member.team?.translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const teamEnTranslation = member.team?.translations.find(
-      (t: any) => t.language === "EN"
-    );
+    const teamFrTranslation = member.team?.translations.find((t: any) => t.language === "FR");
+    const teamEnTranslation = member.team?.translations.find((t: any) => t.language === "EN");
 
     const formattedMember = {
       id: member.id,
@@ -75,10 +70,11 @@ export async function GET(
       lastname: member.lastname,
       email: member.email,
       phone: member.phone,
-      image: member.user?.image || member.image, // Prioritize Google image from User table
+      image: member.user?.image || member.image, 
       gender: member.gender,
       position: member.position,
       isTeamLeader: member.isTeamLeader,
+      isMember: member.isMember,
       createdAt: member.createdAt,
       name: `${member.firstname} ${member.lastname}`.trim() || "Non défini",
       bio: member.translations[0]?.bio,
@@ -92,12 +88,8 @@ export async function GET(
       teamName_fr: teamFrTranslation?.name,
       teamName_en: teamEnTranslation?.name,
       publications: member.publications.map((pub: any) => {
-        const pubFrTranslation = pub.publication.translations.find(
-          (t: any) => t.language === "FR"
-        );
-        const pubEnTranslation = pub.publication.translations.find(
-          (t: any) => t.language === "EN"
-        );
+        const pubFrTranslation = pub.publication.translations.find((t: any) => t.language === "FR");
+        const pubEnTranslation = pub.publication.translations.find((t: any) => t.language === "EN");
 
         return {
           id: pub.publication.id,
@@ -116,7 +108,7 @@ export async function GET(
             firstname: a.author.firstname,
             lastname: a.author.lastname,
           })),
-          url : pub.publication.url || null,
+          url: pub.publication.url || null,
         };
       }),
     };
@@ -128,7 +120,7 @@ export async function GET(
   }
 }
 
-// PUT - Mettre à jour un membre
+// PUT - Update a member
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -140,6 +132,11 @@ export async function PUT(
     }
 
     const { id } = await params;
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ error: "Format d'identifiant invalide" }, { status: 400 });
+    }
+
     const body = await request.json();
     const {
       firstname,
@@ -155,48 +152,35 @@ export async function PUT(
       language = "FR",
     } = body;
 
-    // Vérifier que le membre existe
     const existingMember = await prisma.member.findUnique({
-      where: { id },
+      where: { id: numericId },
     });
 
     if (!existingMember) {
-      return NextResponse.json(
-        { error: "Membre introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Membre introuvable" }, { status: 404 });
     }
 
-    // Vérifier si l'email est déjà utilisé par un autre membre
     if (email && email !== existingMember.email) {
       const emailExists = await prisma.member.findUnique({
         where: { email },
       });
       if (emailExists) {
-        return NextResponse.json(
-          { error: "Un membre avec cet email existe déjà" },
-          { status: 409 }
-        );
+        return NextResponse.json({ error: "Un membre avec cet email existe déjà" }, { status: 409 });
       }
     }
 
-    // Trouver l'équipe si spécifiée
     let team = null;
     if (teamSlug) {
       team = await prisma.team.findUnique({
         where: { slug: teamSlug },
       });
       if (!team) {
-        return NextResponse.json(
-          { error: "Équipe introuvable" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Équipe introuvable" }, { status: 404 });
       }
     }
 
-    // Mettre à jour le membre
     const updatedMember = await prisma.member.update({
-      where: { id },
+      where: { id: numericId },
       data: {
         ...(firstname && { firstname }),
         ...(lastname && { lastname }),
@@ -210,7 +194,7 @@ export async function PUT(
           upsert: {
             where: {
               memberId_language: {
-                memberId: id,
+                memberId: numericId,
                 language: language as Language,
               },
             },
@@ -241,7 +225,6 @@ export async function PUT(
       },
     });
 
-    // Formatter la réponse
     const formattedMember = {
       id: updatedMember.id,
       firstname: updatedMember.firstname,
@@ -267,33 +250,33 @@ export async function PUT(
   }
 }
 
-// DELETE - Supprimer un membre
+// DELETE - Remove a member
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    // Vérifier que le membre existe
+    const { id } = await params;
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ error: "Format d'identifiant invalide" }, { status: 400 });
+    }
+
     const existingMember = await prisma.member.findUnique({
-      where: { id },
+      where: { id: numericId },
     });
 
     if (!existingMember) {
-      return NextResponse.json(
-        { error: "Membre introuvable" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Membre introuvable" }, { status: 404 });
     }
 
-    // Supprimer le membre (les traductions seront supprimées automatiquement avec onDelete: Cascade)
     await prisma.member.delete({
-      where: { id },
+      where: { id: numericId },
     });
 
     return NextResponse.json({ message: "Membre supprimé avec succès" });

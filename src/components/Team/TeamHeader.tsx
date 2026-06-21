@@ -1,48 +1,50 @@
-import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { DDD } from "@/assets";
+"use client";
+
 interface TeamHeaderProps {
   team: {
     name: string;
-    image: string;
+    description?: string; // On accepte la description du JSON ici !
   };
-  imageMap: string;
   keywords: string;
 }
 
-export default function TeamHeader({
-  team,
-  imageMap,
-  keywords,
-}: TeamHeaderProps) {
-  const t = useTranslations();
-
+export default function TeamHeader({ team, keywords }: TeamHeaderProps) {
   return (
-    <div className="flex flex-col gap-3 h-fit  lg:max-w-[450px]">
-      <div className="relative w-fit">
-        <h1 className="text-[18px] md:text-xl lg:text-[24px] font-poppins font-bold text-black text-left lg:text-right">
+    <div className="w-full max-w-5xl mx-auto font-sans antialiased">
+      
+      {/* Academic Top Category Indicator */}
+      <div className="text-xs uppercase tracking-wider text-gray-400 font-bold mb-3">
+        Laboratoire LCSI / Équipes de Recherche
+      </div>
+
+      {/* Main Title Section with Blue Accent Line */}
+      <div className="relative pb-5 mb-6">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
           {team.name}
         </h1>
-        <span className="w-[110px] h-[5px] bg-mainBlue left-0 -bottom-1 absolute"></span>
+        <div className="absolute bottom-0 left-0 w-full h-[3px] bg-mainBlue rounded-full"></div>
       </div>
-      <div className="w-full ">
-        <Image
-          src={imageMap || DDD}
-          alt={team.name}
-          width={400}
-          height={100}
-          className="w-full h-auto border-1 border-grayBorder"
-          priority
-        />
-      </div>
-      <div className="mt-2">
-        <p className="">
-          <span className="font-bold text-gray-900 mr-2 mb-2 sm:mb-0 whitespace-nowrap">
-            {t("TeamDetail.keywords", { defaultValue: "Mots-clés" })}:
-          </span>
-          {keywords}
+
+      {/* AJOUT : Nouvelle Section pour la description détaillée du JSON */}
+      {team.description && (
+        <div className="w-full mb-8">
+          <p className="text-base md:text-lg text-gray-700 leading-relaxed font-normal">
+            {team.description}
+          </p>
+        </div>
+      )}
+
+      {/* INCREASED SIZE: Mots-clés & Domaines Section */}
+      <div className="w-full mt-6 space-y-3">
+        <h3 className="text-sm md:text-base uppercase tracking-wider font-extrabold text-mainBlue border-b border-gray-100 pb-2">
+          Mots-clés & Domaines
+        </h3>
+        
+        <p className="text-base md:text-lg text-gray-600 leading-relaxed font-normal pl-1">
+          {keywords || "Les activités de recherche de cette équipe se concentrent sur les domaines d'application mentionnés ci-dessus."}
         </p>
       </div>
+
     </div>
   );
 }

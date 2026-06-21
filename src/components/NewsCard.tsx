@@ -36,13 +36,12 @@ const NewsCard: React.FC<NewsCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative">
-        <Image
-          src={article.image}
-          width={500}
-          height={500}
-          alt={article.title}
-          className={`w-full object-cover ${isLarge ? "h-64 lg:h-80" : "h-48"}`}
-        />
+      <Image
+		  src={article.image && article.image.trim() !== "" ? article.image : "/placeholder.jpg"}
+		  alt={article.title || "News image"}
+		  width={500}
+		  height={500}
+		/>
         {/* Category Badge */}
         <div className="absolute top-4 left-4">
           <span
@@ -71,7 +70,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
             isLarge ? "" : "h-12"
           }`}
         >
-          {article.description.length > 150
+          {article.description?.length > 150
             ? `${article.description.substring(0, 150)}...`
             : article.description}
         </p>

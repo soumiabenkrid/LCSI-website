@@ -53,21 +53,26 @@ export default function HeroSection() {
           </div>
           
           {/* Stats */}
+		  {/*
           <div className="flex gap-8 mt-10 pt-8 border-t border-gray-200">
             <div className="text-center">
-              <div className="text-3xl font-bold text-mainBlue">50+</div>
+              <div className="text-3xl font-bold text-mainBlue">27+</div>
               <div className="text-sm text-darkgrayTxt font-medium">Chercheurs</div>
             </div>
-            <div className="text-center">
+        
+			<div className="text-center">
               <div className="text-3xl font-bold text-mainBlue">200+</div>
               <div className="text-sm text-darkgrayTxt font-medium">Publications</div>
             </div>
-            <div className="text-center">
+            
+			<div className="text-center">
               <div className="text-3xl font-bold text-mainBlue">5</div>
               <div className="text-sm text-darkgrayTxt font-medium">Équipes</div>
             </div>
           </div>
-        </div>
+		   */}
+		 </div>
+       
         
         <div className="flex justify-end relative w-2/5">
           <div className="w-1/2 h-[350px] bg-gradient-to-br from-grayRectangle to-grayRectangle/70 lg:min-w-[370px] lg:h-[500px] rounded-bl-[60px]"></div>

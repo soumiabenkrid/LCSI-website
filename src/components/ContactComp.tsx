@@ -7,11 +7,11 @@ export default function ContactComp() {
     },
     {
       icon: <Phone className="w-4 h-4 text-mainBlue" />,
-      text: "021 51 60 77",
+      text: "+213 (0) 23 93 91 32",
     },
     {
       icon: <Printer className="w-4 h-4 text-mainBlue" />,
-      text: "021 51 61 56",
+      text: "+213(0) 23 93 91 34​",
     },
     {
       icon: <MapPin className="w-4 h-4 text-mainBlue" />,

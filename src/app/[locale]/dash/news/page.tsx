@@ -7,9 +7,7 @@ import {
   Filter,
   Edit,
   Trash2,
-  Eye,
   Newspaper,
-  X,
   Calendar,
   Tag,
   Loader2,
@@ -100,7 +98,10 @@ export default function NewsPage() {
       }
     }
 
-    fetchUserMemberId();
+    async function initializeUserAndNews() {
+      await fetchUserMemberId();
+    }
+    initializeUserAndNews();
   }, [user]);
 
   // Charger les actualités
@@ -153,19 +154,18 @@ export default function NewsPage() {
       // Filtre par recherche
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const frTranslation = item.translations.find(
-          (t) => t.language === "FR"
-        );
-        const enTranslation = item.translations.find(
-          (t) => t.language === "EN"
-        );
+        
+        // FIX 1: Protection de la recherche contre un tableau de translations inexistant
+        const translations = item.translations || [];
+        const frTranslation = translations.find((t) => t.language === "FR");
+        const enTranslation = translations.find((t) => t.language === "EN");
 
         const matchTitle =
-          frTranslation?.title.toLowerCase().includes(query) ||
-          enTranslation?.title.toLowerCase().includes(query);
+          frTranslation?.title?.toLowerCase().includes(query) ||
+          enTranslation?.title?.toLowerCase().includes(query);
         const matchDescription =
-          frTranslation?.description.toLowerCase().includes(query) ||
-          enTranslation?.description.toLowerCase().includes(query);
+          frTranslation?.description?.toLowerCase().includes(query) ||
+          enTranslation?.description?.toLowerCase().includes(query);
 
         return matchTitle || matchDescription;
       }
@@ -349,7 +349,8 @@ export default function NewsPage() {
         ) : (
           <div className="divide-y divide-grayBorder">
             {filteredNews.map((item) => {
-              const frTranslation = item.translations.find(
+              // FIX 2: Option chaining & array fallback to completely bypass missing translation arrays
+              const frTranslation = item.translations?.find(
                 (t) => t.language === "FR"
               );
               const canModify = canUserModifyNews(item);
@@ -474,7 +475,7 @@ export default function NewsPage() {
         title="Supprimer l'actualité"
         message="Êtes-vous sûr de vouloir supprimer cette actualité ?"
         itemName={
-          deletingNews?.translations.find((t) => t.language === "FR")?.title
+          deletingNews?.translations?.find((t) => t.language === "FR")?.title || ""
         }
         onConfirm={confirmDelete}
         onCancel={() => {

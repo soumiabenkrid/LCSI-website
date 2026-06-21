@@ -146,7 +146,9 @@ export default function CreateNewsDialog({
         }),
       });
 
-      const data = await response.json();
+      // 🌟 SÉCURISATION DU PARSING JSON : Évite le crash "unexpected end of data"
+      const responseText = await response.text();
+      const data = responseText ? JSON.parse(responseText) : {};
 
       if (response.ok) {
         setNotification({
@@ -160,16 +162,16 @@ export default function CreateNewsDialog({
           setNotification(null);
         }, 1500);
       } else {
-        console.error("Error response:", data);
+        console.error(`🚨 Erreur Serveur (${response.status}):`, data);
         setNotification({
-          message: data.error || data.details || "Erreur lors de la création",
+          message: data.error || data.details || `Erreur serveur (${response.status})`,
           type: "error",
         });
       }
     } catch (error) {
       console.error("Error creating news:", error);
       setNotification({
-        message: "Erreur lors de la création de l'actualité",
+        message: "Erreur réseau lors de la création de l'actualité",
         type: "error",
       });
     } finally {

@@ -1,4 +1,5 @@
-import SectionTitle from "@/components/SectionTitle";
+"use client";
+
 import { useTranslations } from "next-intl";
 
 interface Expertise {
@@ -14,31 +15,38 @@ export default function TeamExpertises({ expertises }: TeamExpertisesProps) {
   const t = useTranslations();
 
   return (
-    <div className="mb-0">
-      <div className="flex items-center ">
-        <SectionTitle
-          title={t("TeamDetail.expertises", {
-            defaultValue: "Nos expertises",
-          })}
-          lineColor="#3253BA"
-          font="poppins"
-          extraClass="text-[24px] md:text-[26px] font-bold md:text-nowrap mt-6"
-        />
-        <div className="flex-1 h-px bg-mainBlue ml-4"></div>
+    <div className="w-full mt-8 space-y-4">
+      
+      {/* MATCHING STYLE: Title formatted exactly like Mots-clés section */}
+      <div className="w-full">
+        <h3 className="text-sm md:text-base uppercase tracking-wider font-extrabold text-mainBlue border-b border-gray-100 pb-2">
+          {t("TeamDetail.expertises", { defaultValue: "Nos expertises" })}
+        </h3>
       </div>
-      <ul className="space-y-4 lg:-translate-y-1 -translate-y-10 ">
-        {expertises.map((expertise, index) => (
-          <li key={index} className="flex items-start">
-            <span className="text-black mr-3 mt-1 text-lg">•</span>
-            <div className="text-sm md:text-base">
-              <span className="font-semibold text-gray-900">
-                {expertise.title}:
-              </span>
-              <span className="text-black ml-1">{expertise.description}</span>
-            </div>
-          </li>
-        ))}
+
+      {/* Clean list view */}
+      <ul className="space-y-3 pl-1 mt-3">
+        {expertises && expertises.length > 0 ? (
+          expertises.map((expertise, index) => (
+            <li key={index} className="flex items-start text-base md:text-lg leading-relaxed">
+              <span className="text-mainBlue mr-3 font-bold select-none">•</span>
+              <div>
+                <span className="font-bold text-gray-900 mr-1.5 capitalize">
+                  {expertise.title}
+                </span>
+                {expertise.description && (
+                  <span className="text-gray-600 font-normal">
+                    - {expertise.description}
+                  </span>
+                )}
+              </div>
+            </li>
+          ))
+        ) : (
+          <p className="text-sm text-gray-400 italic pl-1">Aucune expertise spécifiée.</p>
+        )}
       </ul>
+
     </div>
   );
 }

@@ -28,6 +28,7 @@ export default function MembersPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isMember, setIsMember] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
@@ -77,7 +78,8 @@ export default function MembersPage() {
     e.preventDefault();
     setCreateError(null);
     setCreateSuccess(null);
-
+	
+	
     if (!newUserEmail.toLowerCase().endsWith("@esi.dz")) {
       setCreateError("Seuls les emails @esi.dz sont autorisés");
       return;
@@ -247,7 +249,24 @@ export default function MembersPage() {
             )}
 
             <form onSubmit={handleCreateUser} className="space-y-4">
-              <div>
+              <div className="mb-4">
+				  <label className="mb-1 block text-sm font-medium text-darkgrayTxt">
+					Is Member
+				  </label>
+
+				  <div className="flex items-center gap-2">
+					<input
+					  type="checkbox"
+					  checked={isMember}
+					  onChange={(e) => setIsMember(e.target.checked)}
+					  className="h-4 w-4 rounded border-grayBorder text-blue-500 focus:ring-2 focus:ring-blue-500"
+					/>
+					<span className="text-sm text-darkgrayTxt">
+					  Activer si l’utilisateur est membre
+					</span>
+				  </div>
+			</div>
+			  <div>
                 <label className="mb-1 block text-sm font-medium text-darkgrayTxt">
                   Nom complet
                 </label>

@@ -10,9 +10,9 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <TeamsSection />
+      {/*<TeamsSection />
       <PublicationsSection />
-      <MembersSection />
+      <MembersSection />*/}
       <ActualiteSection />
     </>
   );

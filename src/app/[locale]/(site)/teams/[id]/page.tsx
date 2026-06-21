@@ -1,201 +1,172 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { notFound, useParams } from "next/navigation";
-import { DDD, BDA, PI, MA } from "@/assets";
+import { useState, useEffect, use } from "react";
 import {
   TeamExpertises,
   TeamDomains,
   TeamValueAdded,
   TeamHeader,
   TeamMembers,
-  TeamPublications,
   TeamContact,
 } from "@/components/Team";
 
-interface Team {
-  id: string;
-  slug: string;
-  name_fr: string;
-  name_en: string;
-  description_fr: string;
-  description_en: string;
-  valueAdded_fr?: string;
-  valueAdded_en?: string;
-  image?: string;
-  keywords?: string[];
-  domains?: string[];
-  expertises?: string[];
-  memberCount: number;
-  projectCount: number;
+// Importation de ton fichier JSON étendu
+import teamsExtendedData from "@/data/teams-details.json";
+
+interface PageProps {
+  params: Promise<{ id: string; locale: string }> | any;
 }
 
-interface Member {
-  email: Member | undefined;
-  id: string;
-  firstname: string;
-  lastname: string;
-  position: string;
-  gender: "MALE" | "FEMALE";
-  image?: string;
-  isTeamLeader?: boolean;
-}
+export default function TeamDetailPage({ params }: PageProps) {
+  // Gestion de la compatibilité Next 14 / Next 15 pour récupérer les params d'URL
+  const resolvedParams = params && typeof params.then === "function" ? use(params) : params;
+  const urlParam = resolvedParams?.id || resolvedParams?.slug;
+  const currentLocale = resolvedParams?.locale || "fr";
 
-interface Publication {
-  id: string;
-  title_fr?: string;
-  title_en?: string;
-  authors: Array<{
-    firstname: string;
-    lastname: string;
-  }>;
-  journal: string;
-  year: number;
-  publishedAt: string;
-  url?: string | null;
-}
-
-export default function TeamDetailPage() {
-  const params = useParams();
-  const locale = (params?.locale as string) || "fr";
-  const teamId = params.id as string;
-
-  const [team, setTeam] = useState<Team | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [publications, setPublications] = useState<Publication[]>([]);
+  const [team, setTeam] = useState<any>(null);
+  const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTeamData = async () => {
+    const fetchTeamDetails = async () => {
+      if (!urlParam) return;
       try {
         setLoading(true);
 
-        // Fetch team details
-        const teamResponse = await fetch(`/api/teams/${teamId}`);
-        if (!teamResponse.ok) {
-          notFound();
-        }
-        const teamData = await teamResponse.json();
-        setTeam(teamData);
+        // 1. Récupération des données globales de l'équipe (depuis ton API)
+        const response = await fetch(`/api/teams?language=${String(currentLocale).toUpperCase()}`);
+        if (response.ok) {
+          const data = await response.json();
+          const cleanUrlId = decodeURIComponent(urlParam).trim().toLowerCase();
 
-        // Fetch team members
-        const membersResponse = await fetch(`/api/teams/${teamId}/members`);
-        if (membersResponse.ok) {
-          const membersData = await membersResponse.json();
-          setMembers(membersData.members || []);
-        }
+          const currentTeam = data.teams?.find((t: any) => {
+            const cleanId = String(t.id || "").trim().toLowerCase();
+            const cleanSlug = String(t.slug || "").trim().toLowerCase();
+            return cleanId === cleanUrlId || cleanSlug === cleanUrlId;
+          });
 
-        // Fetch team publications
-        const publicationsResponse = await fetch(
-          `/api/teams/${teamId}/publications`
-        );
-        if (publicationsResponse.ok) {
-          const publicationsData = await publicationsResponse.json();
-          setPublications(publicationsData.publications || []);
+          if (currentTeam) {
+            setTeam(currentTeam);
+
+            // 2. Récupération des membres rattachés à cette équipe
+            const membersResponse = await fetch(`/api/teams/${currentTeam.id}/members`);
+            if (membersResponse.ok) {
+              const membersData = await membersResponse.json();
+              setMembers(membersData.members || []);
+            }
+          }
         }
       } catch (error) {
-        console.error("Error fetching team data:", error);
+        console.error("Erreur détails équipe :", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchTeamData();
-  }, [teamId]);
+    fetchTeamDetails();
+  }, [urlParam, currentLocale]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mainBlue"></div>
       </div>
     );
   }
 
   if (!team) {
-    notFound();
+    return (
+      <div className="flex flex-col justify-center items-center min-h-[60vh] bg-white text-center">
+        <p className="text-xl font-bold text-gray-800">Équipe introuvable.</p>
+      </div>
+    );
   }
 
-  // Prepare data for components
+  // ==================== DETECTION DU JSON ULTRA-SÉCURISÉE ====================
+  const idKeyUpper = String(team.id || "").trim().toUpperCase();    // Exemple: "ACTUAL"
+  const slugKeyLower = String(team.slug || "").trim().toLowerCase(); // Exemple: "actual"
+  const idKeyRaw = String(team.id || "").trim();
+
+  // On cherche dans le JSON avec toutes les clés possibles pour être sûr de matcher
+  const jsonExtendedInfo = 
+    (teamsExtendedData as Record<string, any>)[idKeyUpper] || 
+    (teamsExtendedData as Record<string, any>)[slugKeyLower] || 
+    (teamsExtendedData as Record<string, any>)[idKeyRaw];
+
+  // Extraction robuste de la description (on teste tous les formats de JSON possibles)
+  const finalDescription = 
+    jsonExtendedInfo?.description?.[currentLocale] || 
+    jsonExtendedInfo?.[currentLocale]?.description ||
+    jsonExtendedInfo?.[currentLocale] || // Au cas où le texte est direct sous la langue
+    team.description || 
+    team.description_fr || 
+    "";
+
+  // Extraction robuste des Mots-clés
+  const rawKeywords = 
+    jsonExtendedInfo?.keywords?.[currentLocale] || 
+    jsonExtendedInfo?.[currentLocale]?.keywords || 
+    team.keywords || 
+    [];
+  const formattedKeywordsString = Array.isArray(rawKeywords) ? rawKeywords.join(", ") : String(rawKeywords);
+
+  // Extraction robuste des Expertises
+  const rawExpertises = 
+    jsonExtendedInfo?.expertises?.[currentLocale] || 
+    jsonExtendedInfo?.[currentLocale]?.expertises || 
+    team.expertises || 
+    [];
+  
+  // Transformation pour le composant TeamExpertises
+  const expertisesFormatted = Array.isArray(rawExpertises)
+    ? rawExpertises.map((exp: string) => ({ title: exp, description: "" }))
+    : [];
+  // =========================================================================
+
+  // Données nettoyées envoyées à TeamHeader
   const teamForDisplay = {
-    id:team.id,
-    name: locale === "en" ? team.name_en : team.name_fr,
-    description: locale === "en" ? team.description_en : team.description_fr,
-    members: team.memberCount,
-    projects: team.projectCount,
-    buttonText: "",
+    id: team.id,
+    name: team.name || team.name_fr || "Équipe sans nom",
+    description: finalDescription, // Reçoit bien la description du JSON !
     image: team.image || "",
   };
 
-  // Parse keywords, domains, expertises from arrays
-  const keywords = team.keywords?.join(", ") || "";
   const domains = team.domains || [];
-  const expertises = team.expertises || [];
-
-  // Parse value added (assuming it's stored as a comma-separated string or array)
-  const valueAddedText =
-    locale === "en" ? team.valueAdded_en : team.valueAdded_fr;
-  const valueAdded = valueAddedText
-    ? valueAddedText.split("\n").filter((v: string) => v.trim())
-    : [];
-
-  // Format expertises data (if stored as array of strings, convert to objects)
-  const expertisesFormatted = expertises.map((exp: any) => {
-    if (typeof exp === "string") {
-      return { title: exp, description: "" };
-    }
-    return exp;
-  });
-
-  // Format members data
-  const membersFormatted = members.map((member) => ({
+  const valueAdded = team.valueAdded ? team.valueAdded.split("\n").filter((v: string) => v.trim()) : [];
+  
+  const membersFormatted = members.map((member: any) => ({
     id: member.id,
-    name: `${member.firstname} ${member.lastname}`,
-    position: member.position,
-    gender: member.gender,
+    name: `${member.firstname || ""} ${member.lastname || ""}`.trim() || member.name || "Membre",
+    position: member.position || "Chercheur",
+    gender: member.gender || "MALE",
     image: member.image,
   }));
 
-  const teamLeader = members.find(m => m.isTeamLeader);
-
-  // Format publications data
-  const publicationsFormatted = publications.map((pub) => ({
-    id: pub.id,
-    title:
-      (locale === "en"
-        ? pub.title_en || pub.title_fr
-        : pub.title_fr || pub.title_en) || "Sans titre",
-    authors: pub.authors.map((a) => `${a.firstname} ${a.lastname}`),
-    journal: pub.journal,
-    date: new Date(pub.publishedAt).toLocaleDateString(
-      locale === "en" ? "en-US" : "fr-FR",
-      { year: "numeric", month: "long" }
-    ),
-    year: pub.year, // Ajouter l'année pour le filtre
-    url: pub.url,
-  }));
-
-  console.log("publicationsFormatted", publicationsFormatted);
+  const teamLeader = members.find((m: any) => m.isTeamLeader);
 
   return (
     <>
-      <div className=" bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div className="flex lg:flex-row flex-col-reverse gap-8 lg:gap-12">
-            <div className="space-y-8 lg:mt-2">
-              <TeamExpertises expertises={expertisesFormatted} />
-              <TeamDomains domains={domains} />
-              <TeamValueAdded valueAdded={valueAdded} />
+      <div className="bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          <div className="flex flex-col gap-10 w-full">
+            
+            {/* Header avec la description enrichie issue du JSON */}
+            <div className="w-full">
+              <TeamHeader team={teamForDisplay} keywords={formattedKeywordsString} />
             </div>
-            <TeamHeader
-              team={teamForDisplay}
-              imageMap={teamForDisplay.image}
-              keywords={keywords}
-            />
+
+            {/* Sections dynamiques reliées au JSON */}
+            <div className="w-full space-y-10">
+              {expertisesFormatted.length > 0 && <TeamExpertises expertises={expertisesFormatted} />}
+              {domains.length > 0 && <TeamDomains domains={domains} />}
+              {valueAdded.length > 0 && <TeamValueAdded valueAdded={valueAdded} />}
+            </div>
+
           </div>
         </div>
       </div>
+
       <TeamMembers members={membersFormatted} />
-      <TeamPublications publications={publicationsFormatted} />
+      
       <TeamContact
         fullName={teamLeader ? `${teamLeader.firstname} ${teamLeader.lastname}` : ""}
         email={teamLeader && typeof teamLeader.email === "string" ? teamLeader.email : ""}

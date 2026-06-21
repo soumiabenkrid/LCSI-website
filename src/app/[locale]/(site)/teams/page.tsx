@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import TeamDetailCard from "@/components/TeamDetailCard";
 
 interface Team {
-  id: number;
+  id: string | number;
   slug: string;
   image: string;
   name_fr: string;
@@ -13,7 +13,8 @@ interface Team {
   description_fr: string | null;
   description_en: string | null;
   memberCount: number;
-  projectCount: number;
+  publicationsCount?: number;
+  projectCount?: number;
 }
 
 export default function TeamsPage({
@@ -27,7 +28,7 @@ export default function TeamsPage({
   const t = useTranslations("TeamsPage");
 
   useEffect(() => {
-    // Résoudre la promesse params
+    // Résolution de la langue locale
     params.then((resolvedParams) => {
       setLocale(resolvedParams.locale);
     });
@@ -57,22 +58,28 @@ export default function TeamsPage({
 
   return (
     <div>
-      {/* Teams Grid Section */}
-      <div className="py-12 md:py-16">
+      {/* Conteneur principal de la liste des équipes */}
+      <div className="py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 lg:gap-12">
+          {/* Grille sur une seule colonne pour aligner tes cartes horizontales */}
+          <div className="flex flex-col gap-12 lg:gap-16">
             {teams.map((team, index) => {
+              // Sélection des textes selon la langue active
+              const currentName = locale === "fr" ? team.name_fr : team.name_en;
+              const currentDescription = locale === "fr"
+                ? team.description_fr || ""
+                : team.description_en || team.description_fr || "";
+
+              // Préparation des données propres attendues par TeamDetailCard
               const teamData = {
                 id: team.id,
-                name: locale === "fr" ? team.name_fr : team.name_en,
-                description:
-                  locale === "fr"
-                    ? team.description_fr || ""
-                    : team.description_en || team.description_fr || "",
+                name: currentName,
+                description: currentDescription,
                 members: team.memberCount,
-                projects: team.projectCount,
+                // On s'assure de récupérer le bon compteur de l'API (publicationsCount ou projectCount)
+                projects: team.publicationsCount || team.projectCount || 0,
                 buttonText: t("buttonText"),
-                image: team.image,
+                image: team.image, // Transmet directement la clé brute ("ACTUAL.png" ou "ATLAS")
               };
 
               return (
@@ -84,6 +91,7 @@ export default function TeamsPage({
                     animationFillMode: "both",
                   }}
                 >
+                  {/* On appelle le composant directement, c'est lui qui fait tout le design */}
                   <TeamDetailCard teamData={teamData} />
                 </div>
               );

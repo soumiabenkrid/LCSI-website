@@ -1,0 +1,26 @@
+{
+  "ACTUAL": {
+    "fr": "L’équipe aborde les problématiques liées au stockage et à l’accès aux grands volumes de données. Les aspects systèmes, modélisation et analyses sont pris en considération. Nous ciblons les systèmes informatiques avancées basées sur le parallélisme, la distribution, le contrôle de concurrence, la haute disponibilité et les protocoles multi-versions. L’utilisation d’approches de programmation avancée comme les algorithmes de recherche, heuristiques, IA et systèmes autonomes constitue la colonne vertébrale de nos activités. Nous visons des solutions adaptatives, tolérantes et optimisées pour améliorer la robustesse et réduire les coûts d’accès, couvrant des systèmes embarqués à faibles ressources jusqu’aux bases de données extra-larges sur architectures massivement parallèles et flux de données en quasi-continu.",
+ 
+  
+
+
+    "en": "Here is the highly detailed English description for the ACTUAL team, covering all its research directions..."
+  },
+  "ATLAS": {
+    "fr": "Description détaillée en français pour ATLAS...",
+    "en": "Detailed English description for ATLAS..."
+  },
+  "PRINT": {
+    "fr": "Description détaillée en français pour PRINT...",
+    "en": "Detailed English description for PRINT..."
+  },
+  "MA": {
+    "fr": "Description détaillée en français pour MA...",
+    "en": "Detailed English description for MA..."
+  },
+  "IDEAS": {
+    "fr": "Description détaillée en français pour IDEAS...",
+    "en": "Detailed English description for IDEAS..."
+  }
+}

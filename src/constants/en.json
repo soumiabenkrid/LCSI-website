@@ -121,7 +121,8 @@
       "teams": "Teams",
       "publications": "Publications",
       "members": "Members",
-      "news": "News"
+      "news": "News",
+	  "oldVersion": "Old Version"
     },
     "legal": {
       "copyright": "All rights reserved.",

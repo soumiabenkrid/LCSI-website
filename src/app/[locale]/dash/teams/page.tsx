@@ -12,7 +12,6 @@ import {
   Target,
   Lightbulb,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useTeams } from "@/hooks/useTeams";
 import CreateTeamDialog from "@/components/CreateTeamDialog";
@@ -58,10 +57,11 @@ export default function TeamsPage() {
 
   const getTeamColor = (slug: string) => {
     const colors = {
-      DDD: "bg-blue-100 text-blue-800 border-blue-200",
-      BDA: "bg-green-100 text-green-800 border-green-200",
-      PI: "bg-purple-100 text-purple-800 border-purple-200",
+      ATLAS: "bg-blue-100 text-blue-800 border-blue-200",
+      ACTAL: "bg-green-100 text-green-800 border-green-200",
+      PRINT: "bg-purple-100 text-purple-800 border-purple-200",
       MA: "bg-orange-100 text-orange-800 border-orange-200",
+      IDEAS: "bg-orange-100 text-orange-800 border-pink-200",
     };
     return (
       colors[slug as keyof typeof colors] ||
@@ -155,21 +155,19 @@ export default function TeamsPage() {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    {team.image ? (
-                      <Image
+                    {team.image && (team.image.startsWith("/") || team.image.startsWith("http")) ? (
+                      <img
                         src={team.image}
                         alt={team.name || "Team"}
-                        width={48}
-                        height={48}
-                        className="rounded-lg object-cover"
+                        className="w-12 h-12 rounded-lg object-cover"
                       />
                     ) : (
                       <div
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${getTeamColor(
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg border uppercase ${getTeamColor(
                           team.slug
                         )}`}
                       >
-                        <Building size={24} />
+                        {(team.name || "T").charAt(0)}
                       </div>
                     )}
                     <div>

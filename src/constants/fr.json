@@ -12,7 +12,7 @@
   "HomePage": {
     "heroSection": {
       "lab_name": "Laboratoire de la Communication dans les SystEmes Informatiques",
-      "small_description": "LCSI LAB mène des recherches en informatique, genie logiciel, cybersecurite et intelligence artificielle. Notre travail vise à rapprocher les avancees academiques des solutions technologiques concrètes.",
+      "small_description": "Le LCSI est un laboratoire de recherche de l’ESI spécialisé en intelligence artificielle, sciences des données, systèmes distribués et cybersécurité. Il transforme les avancées scientifiques en solutions concrètes pour l’industrie et la société.",
       "KnowMore": "En savoir plus"
     },
     "teamsSection": {
@@ -95,11 +95,11 @@
     },
     "lcsi": {
       "title": "Le LCSI",
-      "description": "Le LCSI (Laboratoire de la Communication dans les Systèmes Informatiques) est un centre de recherche specialise de l’ESI, dedie à l’etude et au developpement de solutions dans des domaines cles de l’informatique, tels que l’intelligence artificielle, les bases de donnees avancees, les systèmes distribues et les mathematiques appliquees. Il regroupe plusieurs equipes de recherche actives, encadrant des etudiants en master et en doctorat. Le laboratoire joue un rôle central dans la formation avancee et la production scientifique de l’ecole, et participe à des projets nationaux (PRFU) ainsi qu’à des collaborations academiques, renforçant ainsi la visibilite de la recherche à l’ESI."
+       "description": "Le Laboratoire de Communication dans les Systèmes Informatiques (LCSI), agréé depuis 2010 et rattaché à l’École nationale Supérieure d’Informatique (ESI), est un laboratoire de recherche pluridisciplinaire spécialisé dans les sciences des données, les systèmes distribués, l’intelligence artificielle, les réseaux et la cybersécurité. À travers ses équipes de recherche, le LCSI développe des approches innovantes pour la gestion des données massives, les systèmes intelligents, la robotique, l’analyse sémantique, l’apprentissage automatique et la modélisation mathématique. Fort de plus de 25 enseignants-chercheurs permanents, de nombreux doctorants et d’un réseau actif de partenaires nationaux et internationaux, le laboratoire contribue à la recherche scientifique et au transfert technologique à travers des projets collaboratifs et des applications à fort impact dans les domaines de la santé, des télécommunications, des villes intelligentes, du patrimoine numérique et de l’aide à la décision."
     },
     "equipe": {
       "title": "Notre Equipe",
-      "description": "Le LCSI regroupe une equipe pluridisciplinaire de chercheurs et enseignants-chercheurs, appuyes par des doctorants et etudiants en master. Le laboratoire est structure autour de quatre equipes de recherche couvrant des domaines varies : bases de donnees, intelligence artificielle, mathematiques appliquees, et systèmes distribues. Chaque equipe est dirigee par un responsable scientifique, et le laboratoire est coordonne par un directeur assiste d’un comite de pilotage."
+      "description": "Le LCSI réunit une équipe pluridisciplinaire de chercheurs, enseignants-chercheurs, doctorants et étudiants en master. Il est organisé en quatre équipes de recherche couvrant les bases de données, l’intelligence artificielle, les mathématiques appliquées et les systèmes distribués."
     },
     "thematiques": {
       "title": "Nos Thematiques",
@@ -183,7 +183,8 @@
       "teams": "equipe",
       "publications": "Publications",
       "members": "Membres",
-      "news": "Actualites"
+      "news": "Actualites",
+	  "oldVersion": "Ancienne version"
     },
     "legal": {
       "copyright": "Tous droits reserves.",

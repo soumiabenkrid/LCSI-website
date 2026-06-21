@@ -1,4 +1,4 @@
-import BDA from "./BDA.png";
+import BDA from "./ACTUAL.png";
 import computerman from "./computerman.jpg";
 import DDD from "./DDD.png";
 import en from "./en.png";

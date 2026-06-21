@@ -51,13 +51,13 @@ export default function Footer() {
                   <p className="text-sm font-medium text-gray-700">
                     {tFooter("info.fax")}
                   </p>
-                  <p className="text-sm text-gray-600">021 51 61 56</p>
+                  <p className="text-sm text-gray-600">+213(0) 23 93 91 34​</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-700">
                     {tFooter("info.tel")}
                   </p>
-                  <p className="text-sm text-gray-600">021 51 60 77</p>
+                  <p className="text-sm text-gray-600">+213 (0) 23 93 91 32</p>
                 </div>
               </div>
             </div>
@@ -118,6 +118,16 @@ export default function Footer() {
                 >
                   {tFooter("explore.news")}
                 </Link>
+                
+                {/* Link to the Old Website added here */}
+                <a
+                  href="https://lcsi.esi.dz/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-gray-600 hover:text-mainBlue transition-colors font-medium border-t border-gray-200/60 pt-2 mt-2"
+                >
+                  {tFooter("explore.oldVersion")} 
+                </a>
               </div>
             </div>
           </div>

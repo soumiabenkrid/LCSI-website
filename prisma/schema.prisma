@@ -141,7 +141,7 @@ model Member {
   gender    Gender
   firstname       String
   lastname        String
-  position  MemberPosition
+  position  MemberPosition?
   isTeamLeader Boolean     @default(false)
   isMember     Boolean     @default(false)
   createdAt DateTime       @default(now())

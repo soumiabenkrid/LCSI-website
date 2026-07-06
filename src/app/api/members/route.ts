@@ -13,19 +13,28 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    const where: any = {};
+    // 1. Only fetch active members who have isMember set to true
+    const where: any = {
+      isMember: true
+    };
 
+    // 2. Updated search layout targeting correct name fields and nested translations
     if (search) {
       where.OR = [
+        { firstname: { contains: search, mode: "insensitive" } },
+        { lastname: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
         {
           translations: {
             some: {
               language,
-              name: { contains: search, mode: "insensitive" },
+              OR: [
+                { bio: { contains: search, mode: "insensitive" } },
+                { institution: { contains: search, mode: "insensitive" } }
+              ]
             },
           },
         },
-        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 

@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    // Rechercher le membre avec toutes ses informations
     const member = await prisma.member.findFirst({
       where: { email: session.user.email },
       include: {
@@ -27,7 +26,6 @@ export async function GET(req: NextRequest) {
     });
 
     if (!member) {
-      // Si aucun membre trouvé, retourner les infos basiques de la session
       return NextResponse.json({
         exists: false,
         email: session.user.email,
@@ -36,7 +34,6 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Convertir la position enum vers le texte lisible
     const positionMap: Record<string, string> = {
       PROFESSOR: "Professeur",
       ASSOCIATE_PROFESSOR: "Maître de conférences",
@@ -48,21 +45,11 @@ export async function GET(req: NextRequest) {
       ENGINEER: "Ingénieur de recherche",
     };
 
-    // Récupérer les traductions
-    const frTranslation = member.translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const enTranslation = member.translations.find(
-      (t: any) => t.language === "EN"
-    );
+    const frTranslation = member.translations.find((t: any) => t.language === "FR");
+    const enTranslation = member.translations.find((t: any) => t.language === "EN");
 
-    // Récupérer les traductions de l'équipe
-    const teamFrTranslation = member.team?.translations.find(
-      (t: any) => t.language === "FR"
-    );
-    const teamEnTranslation = member.team?.translations.find(
-      (t: any) => t.language === "EN"
-    );
+    const teamFrTranslation = member.team?.translations.find((t: any) => t.language === "FR");
+    const teamEnTranslation = member.team?.translations.find((t: any) => t.language === "EN");
 
     return NextResponse.json({
       exists: true,
@@ -86,15 +73,13 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("❌ Erreur lors de la récupération du profil:", error);
     return NextResponse.json(
-      {
-        error: "Erreur serveur lors de la récupération du profil",
-        details: (error as Error)?.message,
-      },
+      { error: "Erreur serveur lors de la récupération du profil" },
       { status: 500 }
     );
   }
 }
 
+// PUT - Mettre à jour le profil// PUT - Mettre à jour le profil
 export async function PUT(req: NextRequest) {
   try {
     const session = await getSession();
@@ -119,53 +104,70 @@ export async function PUT(req: NextRequest) {
       isTeamLeader,
     } = body;
 
-    // Validation basique
-    if (
-      !firstname?.trim() ||
-      !lastname?.trim() ||
-      !position?.trim() ||
-      !teamSlug?.trim() ||
-      !gender
-    ) {
+    if (!firstname?.trim() || !lastname?.trim() || !position?.trim() || !teamSlug?.trim() || !gender) {
       return NextResponse.json(
         { error: "Les champs obligatoires sont requis" },
         { status: 400 }
       );
     }
 
-    // Vérifier si l'équipe existe
     const team = await prisma.team.findFirst({
       where: { slug: teamSlug },
     });
 
     if (!team) {
-      return NextResponse.json(
-        { error: "Équipe non trouvée" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Équipe non trouvée" }, { status: 400 });
     }
 
-    // Rechercher le membre existant avec ses traductions
     const existingMember = await prisma.member.findFirst({
       where: { email: session.user.email },
-      include: {
-        translations: true,
-        team: true,
-      },
+      include: { translations: true, team: true },
     });
 
     if (!existingMember) {
-      return NextResponse.json(
-        { error: "Profil membre non trouvé" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Profil membre non trouvé" }, { status: 404 });
     }
 
-    // Pour l'instant, on permet simplement la mise à jour du statut de chef
-    // TODO: Ajouter une validation plus sophistiquée si nécessaire
+    // 💡 NETTOYAGE DU TÉLÉPHONE : Convertir "" en null pour éviter les conflits Prisma P2002
+    const formattedPhone = phone?.trim() ? phone.trim() : null;
+
+    // 💡 VÉRIFICATION EXPLICITE DU TÉLÉPHONE DUPLIQUÉ
+    if (formattedPhone) {
+      const phoneDuplicate = await prisma.member.findFirst({
+        where: {
+          phone: formattedPhone,
+          NOT: { id: existingMember.id } // Ignorer l'utilisateur lui-même
+        }
+      });
+
+      if (phoneDuplicate) {
+        return NextResponse.json(
+          { error: "Ce numéro de téléphone est déjà utilisé par un autre membre." },
+          { status: 400 }
+        );
+      }
+    }
+
     const finalIsTeamLeader = Boolean(isTeamLeader);
 
-    // Mapping des positions français vers l'enum Prisma
+    // 💡 SÉCURITÉ CONTRAINTE UNIQUE : Gestion de la passation de rôle de chef d'équipe
+    if (finalIsTeamLeader) {
+      const activeLeader = await prisma.member.findFirst({
+        where: {
+          teamId: team.id,
+          isTeamLeader: true,
+          NOT: { id: existingMember.id }
+        }
+      });
+
+      if (activeLeader) {
+        await prisma.member.update({
+          where: { id: activeLeader.id },
+          data: { isTeamLeader: false }
+        });
+      }
+    }
+
     const positionMapping: Record<string, MemberPosition> = {
       Professeur: MemberPosition.PROFESSOR,
       "Maître de conférences": MemberPosition.ASSOCIATE_PROFESSOR,
@@ -176,22 +178,14 @@ export async function PUT(req: NextRequest) {
     };
 
     const positionEnum = positionMapping[position];
-    console.log(
-      `🔍 Position reçue: "${position}", Position enum: "${positionEnum}"`
-    );
-
     if (!positionEnum) {
       return NextResponse.json(
-        {
-          error: `Position "${position}" non reconnue. Positions valides: ${Object.keys(
-            positionMapping
-          ).join(", ")}`,
-        },
+        { error: `Position "${position}" non reconnue.` },
         { status: 400 }
       );
     }
 
-    // Mettre à jour le membre
+    // Exécution de la mise à jour principale du membre
     const updatedMember = await prisma.member.update({
       where: { id: existingMember.id },
       data: {
@@ -200,80 +194,52 @@ export async function PUT(req: NextRequest) {
         position: positionEnum,
         teamId: team.id,
         gender: gender as "MALE" | "FEMALE",
-        phone: phone?.trim() || null,
+        phone: formattedPhone, // Utilisation de la valeur formatée (string ou null)
         isTeamLeader: finalIsTeamLeader,
       },
       include: {
         team: {
           select: {
             slug: true,
-            translations: {
-              select: {
-                name: true,
-                language: true,
-              },
-            },
+            translations: { select: { name: true, language: true } },
           },
         },
         translations: true,
       },
     });
 
-    // Mettre à jour les traductions séparément pour FR et EN
+    // Mises à jour des traductions (Upserts)
     await prisma.memberTranslation.upsert({
-      where: {
-        memberId_language: {
-          memberId: existingMember.id,
-          language: "FR",
-        },
-      },
-      update: {
-        bio: bio_fr?.trim() || null,
-        institution: institution_fr?.trim() || null,
-      },
-      create: {
-        memberId: existingMember.id,
-        language: "FR",
-        bio: bio_fr?.trim() || null,
-        institution: institution_fr?.trim() || null,
-      },
+      where: { memberId_language: { memberId: existingMember.id, language: "FR" } },
+      update: { bio: bio_fr?.trim() || null, institution: institution_fr?.trim() || null },
+      create: { memberId: existingMember.id, language: "FR", bio: bio_fr?.trim() || null, institution: institution_fr?.trim() || null },
     });
 
     await prisma.memberTranslation.upsert({
-      where: {
-        memberId_language: {
-          memberId: existingMember.id,
-          language: "EN",
-        },
-      },
-      update: {
-        bio: bio_en?.trim() || null,
-        institution: institution_en?.trim() || null,
-      },
-      create: {
-        memberId: existingMember.id,
-        language: "EN",
-        bio: bio_en?.trim() || null,
-        institution: institution_en?.trim() || null,
-      },
+      where: { memberId_language: { memberId: existingMember.id, language: "EN" } },
+      update: { bio: bio_en?.trim() || null, institution: institution_en?.trim() || null },
+      create: { memberId: existingMember.id, language: "EN", bio: bio_en?.trim() || null, institution: institution_en?.trim() || null },
     });
+
+    const safelySerializedMember = JSON.parse(JSON.stringify(updatedMember));
 
     return NextResponse.json({
       message: "Profil mis à jour avec succès",
-      member: updatedMember,
+      member: safelySerializedMember,
     });
+
   } catch (error) {
-    console.error("❌ Erreur détaillée lors de la mise à jour du profil:");
-    console.error("Type:", typeof error);
-    console.error("Message:", (error as Error)?.message);
-    console.error("Stack:", (error as Error)?.stack);
-    console.error("Erreur complète:", error);
+    console.error("❌ Erreur lors de la mise à jour du profil:", error);
+
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Une valeur unique (comme le téléphone) entre en conflit avec un membre existant." },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json(
-      {
-        error: "Erreur serveur lors de la mise à jour du profil",
-        details: (error as Error)?.message,
-      },
+      { error: "Erreur serveur lors de la mise à jour du profil", details: (error as Error)?.message },
       { status: 500 }
     );
   }

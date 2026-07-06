@@ -37,9 +37,17 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         const response = await fetch("/api/stats");
+        
         if (response.ok) {
-          const data = await response.json();
-          setStats(data);
+          // Read as text first to verify it's not empty before parsing
+          const text = await response.text();
+          const data = text ? JSON.parse(text) : null;
+          
+          if (data) {
+            setStats(data);
+          }
+        } else {
+          console.error(`API response error status: ${response.status}`);
         }
       } catch (error) {
         console.error("Error fetching stats:", error);

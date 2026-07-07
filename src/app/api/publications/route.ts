@@ -140,16 +140,19 @@ export async function GET(request: NextRequest) {
         hasMore: offset + limit < total,
       },
     });
-  }    catch (error: any) {
-  // Add this block to inspect the unique constraint failure
-  if (error.code === 'P2002') {
-    console.error("❌ Unique constraint failed on fields:", error.meta?.target);
-  } else {
-    console.error("Erreur lors de la création de la publication:", error);
-  }
-  console.error("❌ FULL PRISMA ERROR DETAILED:", JSON.stringify(error, null, 2));
-  return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
-}
+	} catch (error: any) {
+	  if (error.code === "P2002") {
+		console.error("❌ Unique constraint failed on fields:", error.meta?.target);
+	  } else {
+		console.error("Erreur lors de la création de la publication:", error);
+	  }
+	  console.error(
+		"❌ FULL PRISMA ERROR DETAILED:",
+		JSON.stringify(error, null, 2)
+	  );
+	  return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+	}
+	}
 
 }
 

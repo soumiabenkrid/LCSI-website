@@ -52,7 +52,7 @@ export async function getSession(): Promise<AuthSession | null> {
 
     // Fetch user from database
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: parseInt(userId, 10) },
       select: {
         id: true,
         email: true,
@@ -68,7 +68,7 @@ export async function getSession(): Promise<AuthSession | null> {
 
     return {
       user: {
-        id: user.id,
+        id: user.id.toString(), // 💡 Convert the number back to a string for the session object
         email: user.email,
         name: user.name,
         image: user.image,

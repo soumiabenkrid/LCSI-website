@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-// GET /api/contents/[slug] -> Récupération unitaire (Hybride ID ou Slug)
+// GET /api/contents/[id] -> Récupération unitaire (Hybride ID ou Slug)
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ id: string }> } // 1. Changed 'slug' to 'id' here
 ) {
   try {
-    const { slug } = await params;
+    const { id } = await params; // 2. Destructure 'id'
+    const slug = id; // 3. Reassign to 'slug' so your existing logic doesn't break!
 
     if (!slug) {
       return NextResponse.json({ error: "Identifiant/Slug manquant" }, { status: 400 });
@@ -36,10 +37,10 @@ export async function GET(
   }
 }
 
-// DELETE /api/contents/[slug] -> Suppression unitaire (Hybride ID ou Slug)
+// DELETE /api/contents/[id] -> Suppression unitaire (Hybride ID ou Slug)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ id: string }> } // 1. Changed 'slug' to 'id' here
 ) {
   try {
     const session = await getSession();
@@ -47,7 +48,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    const { slug } = await params;
+    const { id } = await params; // 2. Destructure 'id'
+    const slug = id; // 3. Reassign to 'slug'
 
     if (!slug) {
       return NextResponse.json({ error: "Identifiant/Slug manquant" }, { status: 400 });

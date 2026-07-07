@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       phone: member.phone,
       image: member.user?.image || member.image,
       gender: member.gender,
-      position: positionMap[member.position] || member.position,
+      position: member.position ? (positionMap[member.position] || member.position) : "",
       teamSlug: member.team?.slug,
       teamName_fr: teamFrTranslation?.name,
       teamName_en: teamEnTranslation?.name,

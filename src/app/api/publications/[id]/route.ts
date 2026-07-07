@@ -6,14 +6,14 @@ import { canUserModifyPublication } from "@/lib/publicationPermissions";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> } // or standard context
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
 
     const publication = await prisma.publication.findUnique({
       where: {
-        id: Number(id), // 💡 CRITICAL: Ensure this is wrapped in Number()
+        id: Number(id), // Already correctly handled here
       },
       include: {
         translations: true,
@@ -38,6 +38,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const numericId = parseInt(id, 10); // 💡 Convert once to reuse cleanly
+
   try {
     const session = await getSession();
     if (!session) {
@@ -46,7 +48,7 @@ export async function PUT(
 
     const body = await request.json();
     const {
-      translations, // { FR: {...}, EN: {...} }
+      translations,
       journal,
       volume,
       issue,
@@ -56,12 +58,12 @@ export async function PUT(
       year,
       publishedAt,
       teamSlug,
-      authors, // Array of { memberId: string, order: number }
+      authors,
     } = body;
 
     // Vérifier que la publication existe
     const existingPublication = await prisma.publication.findUnique({
-      where: { id },
+      where: { id: numericId }, // 💡 Fixed
     });
 
     if (!existingPublication) {
@@ -75,7 +77,7 @@ export async function PUT(
     const userEmail = session.user?.email || "";
     const userRole = (session.user as any)?.role || "MEMBER";
 
-    const canModify = await canUserModifyPublication(userEmail, userRole, id);
+    const canModify = await canUserModifyPublication(userEmail, userRole, numericId); // 💡 Fixed
     if (!canModify) {
       return NextResponse.json(
         {
@@ -116,7 +118,7 @@ export async function PUT(
 
     // Mettre à jour la publication
     const updatedPublication = await prisma.publication.update({
-      where: { id },
+      where: { id: numericId }, // 💡 Fixed
       data: {
         ...(journal && { journal }),
         ...(volume !== undefined && { volume }),
@@ -129,7 +131,7 @@ export async function PUT(
         ...(team && { teamId: team.id }),
         ...(authors && {
           authors: {
-            deleteMany: {}, // Supprimer tous les auteurs existants
+            deleteMany: {},
             create: authors.map((author: any) => ({
               authorId: author.memberId,
               order: author.order || 1,
@@ -144,7 +146,7 @@ export async function PUT(
       await prisma.publicationTranslation.upsert({
         where: {
           publicationId_language: {
-            publicationId: id,
+            publicationId: numericId, // 💡 Fixed
             language: Language.FR,
           },
         },
@@ -154,7 +156,7 @@ export async function PUT(
           keywords: translations.FR.keywords || [],
         },
         create: {
-          publicationId: id,
+          publicationId: numericId, // 💡 Fixed
           language: Language.FR,
           title: translations.FR.title,
           abstract: translations.FR.abstract || null,
@@ -167,7 +169,7 @@ export async function PUT(
       await prisma.publicationTranslation.upsert({
         where: {
           publicationId_language: {
-            publicationId: id,
+            publicationId: numericId, // 💡 Fixed
             language: Language.EN,
           },
         },
@@ -177,7 +179,7 @@ export async function PUT(
           keywords: translations.EN.keywords || [],
         },
         create: {
-          publicationId: id,
+          publicationId: numericId, // 💡 Fixed
           language: Language.EN,
           title: translations.EN.title,
           abstract: translations.EN.abstract || null,
@@ -188,7 +190,7 @@ export async function PUT(
 
     // Récupérer la publication mise à jour avec toutes ses relations
     const finalPublication = await prisma.publication.findUnique({
-      where: { id },
+      where: { id: numericId }, // 💡 Fixed
       include: {
         translations: true,
         team: {
@@ -262,6 +264,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const numericId = parseInt(id, 10); // 💡 Convert to integer
+
   try {
     const session = await getSession();
     if (!session) {
@@ -270,7 +274,7 @@ export async function DELETE(
 
     // Vérifier que la publication existe
     const existingPublication = await prisma.publication.findUnique({
-      where: { id },
+      where: { id: numericId }, // 💡 Fixed
     });
 
     if (!existingPublication) {
@@ -284,7 +288,7 @@ export async function DELETE(
     const userEmail = session.user?.email || "";
     const userRole = (session.user as any)?.role || "MEMBER";
 
-    const canDelete = await canUserModifyPublication(userEmail, userRole, id);
+    const canDelete = await canUserModifyPublication(userEmail, userRole, numericId); // 💡 Fixed
     if (!canDelete) {
       return NextResponse.json(
         {
@@ -294,9 +298,9 @@ export async function DELETE(
       );
     }
 
-    // Supprimer la publication (les traductions et auteurs seront supprimés automatiquement avec onDelete: Cascade)
+    // Supprimer la publication
     await prisma.publication.delete({
-      where: { id },
+      where: { id: numericId }, // 💡 Fixed
     });
 
     return NextResponse.json({ message: "Publication supprimée avec succès" });

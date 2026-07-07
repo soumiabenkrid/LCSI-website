@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create session
-    await createSession(user.id);
+    await createSession(user.id.toString());
 
     // Return user data (excluding password)
     return NextResponse.json({

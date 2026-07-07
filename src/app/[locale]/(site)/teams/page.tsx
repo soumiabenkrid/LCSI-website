@@ -73,13 +73,18 @@ export default function TeamsPage({
               // Préparation des données propres attendues par TeamDetailCard
               const teamData = {
                 id: team.id,
+                slug: team.slug || "", // Added missing slug
                 name: currentName,
                 description: currentDescription,
                 members: team.memberCount,
-                // On s'assure de récupérer le bon compteur de l'API (publicationsCount ou projectCount)
                 projects: team.publicationsCount || team.projectCount || 0,
                 buttonText: t("buttonText"),
-                image: team.image, // Transmet directement la clé brute ("ACTUAL.png" ou "ATLAS")
+                image: team.image,
+                
+                // Added missing required array fields with fallback defaults
+                keywords: [],
+                domains: [],
+                expertises: [],
               };
 
               return (
@@ -89,7 +94,8 @@ export default function TeamsPage({
                   style={{
                     animationDelay: `${index * 100}ms`,
                     animationFillMode: "both",
-                  }}
+                    animationOriginal: "both", // Standard typing compatibility
+                  } as React.CSSProperties}
                 >
                   {/* On appelle le composant directement, c'est lui qui fait tout le design */}
                   <TeamDetailCard teamData={teamData} />

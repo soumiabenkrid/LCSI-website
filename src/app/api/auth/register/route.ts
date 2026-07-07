@@ -66,20 +66,20 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. FIX: Safely parse French or custom variations from UI dropdowns to precise backend Enums
-    let selectedRole = UserRole.MEMBER;
+    let selectedRole: UserRole = UserRole.MEMBER;
     if (role === "ADMIN" || role?.toUpperCase() === "ADMIN") {
       selectedRole = UserRole.ADMIN;
     } else if (role === "AUTHOR" || role?.toUpperCase() === "AUTHOR") {
       selectedRole = UserRole.AUTHOR;
     }
 
-    let selectedGender = Gender.MALE;
+    let selectedGender: Gender = Gender.MALE;
     if (gender === "Femme" || gender === "FEMALE" || gender?.toUpperCase() === "FEMALE") {
       selectedGender = Gender.FEMALE;
     }
 
     // Map localized string variants smoothly to positions
-    let selectedPosition = MemberPosition.ASSOCIATE_PROFESSOR;
+    let selectedPosition: MemberPosition = MemberPosition.ASSOCIATE_PROFESSOR;
     if (position) {
       const normalizedPos = position.trim().toLowerCase();
       if (normalizedPos.includes("professeur") || normalizedPos === "professor") {

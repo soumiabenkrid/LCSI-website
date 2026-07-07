@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function isUserAuthorOfPublication(
   userEmail: string,
-  publicationId: string
+  publicationId: number // 💡 Changed from string to number
 ): Promise<boolean> {
   try {
     // Trouver le membre correspondant à l'email
@@ -20,7 +20,7 @@ export async function isUserAuthorOfPublication(
     // Vérifier si le membre est auteur de cette publication
     const authorRelation = await prisma.publicationAuthor.findFirst({
       where: {
-        publicationId: publicationId,
+        publicationId: publicationId, // 💡 Prisma will now accept this safely as a number
         authorId: member.id,
       },
     });
@@ -43,7 +43,7 @@ export async function isUserAuthorOfPublication(
 export async function canUserModifyPublication(
   userEmail: string,
   userRole: string,
-  publicationId: string
+  publicationId: number // 💡 Changed from string to number
 ): Promise<boolean> {
   // Admin peut tout faire
   if (userRole === "ADMIN") {
@@ -51,7 +51,7 @@ export async function canUserModifyPublication(
   }
 
   // Member : vérifier s'il est auteur
-  if (userRole === "MEMBER") {
+  if (userRole === "MEMBER" || userRole === "AUTHOR") { // Added AUTHOR just in case your app uses it
     return await isUserAuthorOfPublication(userEmail, publicationId);
   }
 

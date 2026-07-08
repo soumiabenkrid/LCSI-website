@@ -22,11 +22,11 @@ export default function Header() {
   const { user, isLoading } = useAuth();
   const params = useParams();
   const locale = params.locale as string;
-
+ //   { key: "publications", href: "/publications" },
   const navItems = [
     { key: "presentation", href: "/presentation" },
     { key: "teams", href: "/teams" },
-    { key: "publications", href: "/publications" },
+ 
     { key: "members", href: "/members" },
     { key: "news", href: "/news" },
   ];

@@ -2,7 +2,7 @@ import {
   HeroSection,
   TeamsSection,
   ActualiteSection,
-  PublicationsSection,
+  //PublicationsSection,
   MembersSection,
 } from "@/components/HomePageSections";
 

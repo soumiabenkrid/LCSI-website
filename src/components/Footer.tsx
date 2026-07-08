@@ -121,7 +121,7 @@ export default function Footer() {
                 
                 {/* Link to the Old Website added here */}
                 <a
-                  href="https://lcsi.esi.dz/" 
+                  href="/OldWebsite/index.htm" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-sm text-gray-600 hover:text-mainBlue transition-colors font-medium border-t border-gray-200/60 pt-2 mt-2"

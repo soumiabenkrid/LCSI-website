@@ -52,8 +52,8 @@ export default function TeamContact(tl: TeamLeader) {
             <span className="text-xs text-gray-400 uppercase tracking-wider font-bold block mb-0.5">
               {t("teamEmail")}
             </span>
-            <a href="mailto:lcsi@esi.dz" className="font-bold text-gray-900 text-base block hover:text-mainBlue transition-colors">
-              lcsi@esi.dz
+            <a href="mailto:contact_lcsi@esi.dz" className="font-bold text-gray-900 text-base block hover:text-mainBlue transition-colors">
+              contact_lcsi@esi.dz
             </a>
             <p className="text-xs text-gray-500 font-medium truncate mt-0.5">
               {t("info")}

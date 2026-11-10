@@ -36,12 +36,12 @@ export async function GET(req: NextRequest) {
 
     const positionMap: Record<string, string> = {
       PROFESSOR: "Professeur",
-      ASSOCIATE_PROFESSOR: "Maître de conférences",
-      ASSISTANT_PROFESSOR: "Professeur assistant",
-      LECTURER: "Chercheur",
+      ASSOCIATE_PROFESSOR: "Maître de conférences A",
+      ASSISTANT_PROFESSOR: "Maître de conférences B",
+      LECTURER: "Maître Assistant A",
       RESEARCHER: "Chercheur",
       PHD_STUDENT: "Doctorant",
-      MASTER_STUDENT: "Doctorant",
+      MASTER_STUDENT: "Etudiant Master",
       ENGINEER: "Ingénieur de recherche",
     };
 

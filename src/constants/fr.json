@@ -95,7 +95,7 @@
     },
     "lcsi": {
       "title": "Le LCSI",
-       "description": "Le Laboratoire de Communication dans les Systèmes Informatiques (LCSI), agréé depuis 2010 et rattaché à l’École nationale Supérieure d’Informatique (ESI), est un laboratoire de recherche pluridisciplinaire spécialisé dans les sciences des données, les systèmes distribués, l’intelligence artificielle, les réseaux et la cybersécurité. À travers ses équipes de recherche, le LCSI développe des approches innovantes pour la gestion des données massives, les systèmes intelligents, la robotique, l’analyse sémantique, l’apprentissage automatique et la modélisation mathématique. Fort de plus de 25 enseignants-chercheurs permanents, de nombreux doctorants et d’un réseau actif de partenaires nationaux et internationaux, le laboratoire contribue à la recherche scientifique et au transfert technologique à travers des projets collaboratifs et des applications à fort impact dans les domaines de la santé, des télécommunications, des villes intelligentes, du patrimoine numérique et de l’aide à la décision."
+       "description": "Le LCSI est agrée par l'arrêté n° 93 du 25 mars 2010, il est le second laboratoire de l'ESI. Il se distingue par une approche pluridisciplinaire, située au carrefour des sciences de la donnée, des réseaux et de l'ingénierie logicielle. Son identité repose sur la conception d'architectures communicantes capables de connecter des mondes variés, tout en intégrant sécurité et fiabilité. En décloisonnant les savoir-faire, il transforme les flux d'informations complexes en solutions concrètes pour l'industrie, la recherche scientifique et la société."
     },
     "equipe": {
       "title": "Notre Equipe",
@@ -103,7 +103,7 @@
     },
     "thematiques": {
       "title": "Nos Thematiques",
-      "description": "Le LCSI est un laboratoire de recherche appliquee qui explore plusieurs domaines de l’informatique avancee, comme les systèmes repartis, les bases de donnees post-relationnelles, l’intelligence artificielle, le traitement d’images, la fouille de donnees et les mathematiques appliquees. Il s’interesse aussi à l’analyse semantique, la visualisation spatio-temporelle et les technologies emergentes en science des donnees. Ses travaux aboutissent à des publications, des prototypes et contribuent à la formation par la recherche, souvent en collaboration avec d'autres laboratoires ou partenaires industriels."
+      "description": "Notre laboratoire concentre ses travaux de recherche sur la convergence stratégique entre la gestion avancée des systèmes distribués de données, l’optimisation des systèmes intelligents centrées sur les données, l'intelligence robotique et la perception, l'intelligence sémantique et linguistique,  ainsi que mathématiques appliquées. Notre démarche scientifique vise à concevoir des modèles décisionnels et algorithmiques innovants. Cette vision globale s'appuie sur une maîtrise des réseaux et de la cybersécurité, garantissant la haute disponibilité, l'interconnexion fluide et la protection optimale des informations au sein des écosystèmes numériques. "
     },
     "local": {
       "title": "Notre Local",

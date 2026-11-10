@@ -15,23 +15,14 @@ export default function PresentationPage() {
         className="bg-gray-50"
       />
 
-      {/* Notre Équipe Section */}
-      <PresentationSection
-        title={t("equipe.title")}
-        description={t("equipe.description")}
-        image={equipe}
-        imageAlt="LCSI Team"
-        reverse={true}
-        className="bg-white"
-      />
-
       {/* Nos Thématiques Section */}
       <PresentationSection
         title={t("thematiques.title")}
         description={t("thematiques.description")}
         image={thematique}
         imageAlt="LCSI Research Themes"
-        className="bg-gray-50"
+        reverse={true}
+		className="bg-gray-50"
       />
       {/* Notre local Section */}
       <PresentationSection
@@ -39,7 +30,6 @@ export default function PresentationPage() {
         description={t("local.description")}
         image={local}
         imageAlt="LCSI local"
-        reverse={true}
         className="bg-white"
       />
     </div>

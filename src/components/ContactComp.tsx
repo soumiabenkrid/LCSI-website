@@ -3,7 +3,7 @@ export default function ContactComp() {
   const contact = [
     {
       icon: <Mail className="w-4 h-4 text-mainBlue" />,
-      text: "lcsi@esi.dz",
+      text: "contact_lcsi@esi.dz",
     },
     {
       icon: <Phone className="w-4 h-4 text-mainBlue" />,
